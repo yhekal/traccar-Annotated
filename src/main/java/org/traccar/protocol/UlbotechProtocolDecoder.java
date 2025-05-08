@@ -309,7 +309,7 @@ public class UlbotechProtocolDecoder extends BaseProtocolDecoder {
                 response.writeByte(DATA_GPS);
                 response.writeByte(0xFE);
                 response.writeShort(buf.getShort(response.writerIndex() - 1 - 2));
-                response.writeShort(Checksum.crc16(Checksum.CRC16_XMODEM, response.nioBuffer(1, 4)));
+                response.writeShort(Checksum.crc16(Checksum.CRC16_XMODEM, response.nioBuffer(1, 4))); // &line[Checksum_crc16]
                 response.writeByte(0xF8);
                 channel.writeAndFlush(new NetworkMessage(response, remoteAddress));
             }
@@ -319,7 +319,7 @@ public class UlbotechProtocolDecoder extends BaseProtocolDecoder {
 
             if (channel != null) {
                 channel.writeAndFlush(new NetworkMessage(Unpooled.copiedBuffer(String.format("*TS01,ACK:%04X#",
-                        Checksum.crc16(Checksum.CRC16_XMODEM, buf.nioBuffer(1, buf.writerIndex() - 2))),
+                        Checksum.crc16(Checksum.CRC16_XMODEM, buf.nioBuffer(1, buf.writerIndex() - 2))), // &line[Checksum_crc16]
                         StandardCharsets.US_ASCII), remoteAddress));
             }
 

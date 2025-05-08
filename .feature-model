@@ -1,0 +1,147 @@
+Security_Features_Library
+    Access_Control
+          Authentication
+            keySet
+            GoogleAuthenticator_createCredentials_getKey
+            authenticator_authorize
+    Cryptography
+          Encryption
+            AES
+          Key_Management
+            KeyPairGenerator_getInstance
+            keySpec
+    System_State_Protection
+          Session_Management
+            getSession
+            getAttribute
+            setStatus
+            sendError
+          Miscellaneous
+            createSSLEngine
+            SecurityContext
+            setSecurityContext
+            SecurityExceptionSharing
+            SecurityExceptionTempUser
+
+
+
+    Security_Features_Library_Tool
+        Cryptography
+              Key_Management
+                KeyGeneration_generatePublic_L
+                KeyGeneration_getInstance_L
+                KeyGeneration_X509EncodedKeySpec_L
+                KeyGeneration_generatePrivate_L
+                KeyGeneration_getPublic_L
+                KeyGeneration_getPrivate_L
+                KeyGeneration_getEncoded_L
+                KeyGeneration_generateKeyPair_L
+                KeyGeneration_PKCS8EncodedKeySpec_L
+                KeyGeneration_initialize_L
+                KeyGeneration_ECGenParameterSpec_L
+              Signature
+                Signature_getInstance_L
+                Signature_initSign_L
+                Signature_update_L
+                Signature_sign_L
+                Signature_initVerify_L
+                Signature_verify_L
+        Secure_Data_Handling
+              Trusted_Sources
+                SourceOfRandomness_SecureRandom_L
+                SourceOfRandomness_SecureRandom_nextBytes_L
+
+
+Security_Features_Custom
+    Access_Control
+          Authentication
+            setPassword
+            isPasswordValid
+            login
+            LogAction_create
+            userLogin
+            failedLogin
+            getTotpKey
+            getHashedPassword
+            requestToken
+            openIdAuth
+            generateTotpKey
+            login_credentials
+            login_token
+            login_email
+            login_email_administrator
+            getAuthenticationScheme
+            verifyToken
+            getToken
+            generateToken
+            TokenManager
+          Authorization
+            Permission_Class
+            getPermissions
+            addPermission
+            formatPermissionQuery
+            executePermissionsQuery
+            removePermission
+            getKey
+            checkPermission_Custom
+            checkPermissionTypes
+            invalidatePermission
+            checkUserEnabled
+            checkUserCode
+            notAdmin
+            checkAdmin
+            checkManager
+            checkRestriction
+            checkEdit
+            checkUserUpdate
+            excludeGroups
+            checkPermission
+            getAccessibleDevices
+            checkUser
+            getAdministrator
+            setAdministrator
+            invalidateObject
+            getExpirationTime
+    Cryptography
+          Encryption
+              decode
+          Key_Management
+              CryptoManager
+              initializeKeys
+          Signature
+            sign
+            verify
+            setPublicKey
+            setPrivateKey
+          Hashing
+            Hashing_Class
+            SecretKeyFactory
+            HashingResult
+            getHash
+            getSalt
+            createHash
+            validatePassword
+            slowEquals
+    System_State_Protection
+          System_State_Validation
+            validateImei
+            Checksum_crc8
+            Checksum_crc16
+            Checksum_crc32
+            Checksum_luhn
+            Checksum_modulo256
+            Checksum_xor
+            Checksum_sum
+            Checksum_ip
+          Miscellaneous
+            SecurityRequestFilter
+            filter
+            UserSecurityContext
+
+
+
+
+
+
+
+

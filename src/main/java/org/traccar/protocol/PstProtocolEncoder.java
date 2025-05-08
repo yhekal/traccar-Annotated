@@ -41,7 +41,7 @@ public class PstProtocolEncoder extends BaseProtocolEncoder {
         buf.writeShort(data1);
         buf.writeShort(data2);
 
-        buf.writeShort(Checksum.crc16(Checksum.CRC16_XMODEM, buf.nioBuffer()));
+        buf.writeShort(Checksum.crc16(Checksum.CRC16_XMODEM, buf.nioBuffer())); // &line[Checksum_crc16]
 
         return buf;
     }

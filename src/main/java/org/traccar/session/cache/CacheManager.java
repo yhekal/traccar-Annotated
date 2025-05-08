@@ -298,7 +298,7 @@ public class CacheManager implements BroadcastInterface {
 
     private void initializeCache(BaseModel object) throws Exception {
         if (object instanceof User) {
-            for (Permission permission : storage.getPermissions(User.class, Notification.class)) {
+            for (Permission permission : storage.getPermissions(User.class, Notification.class)) { // &line[getPermissions]
                 if (permission.getOwnerId() == object.getId()) {
                     invalidatePermission(
                             permission.getOwnerClass(), permission.getOwnerId(),
@@ -312,7 +312,7 @@ public class CacheManager implements BroadcastInterface {
                     invalidatePermission(object.getClass(), object.getId(), Group.class, groupId, true);
                 }
 
-                for (Permission permission : storage.getPermissions(User.class, object.getClass())) {
+                for (Permission permission : storage.getPermissions(User.class, object.getClass())) { // &line[getPermissions]
                     if (permission.getPropertyId() == object.getId()) {
                         invalidatePermission(
                                 object.getClass(), object.getId(), User.class, permission.getOwnerId(), true);
@@ -320,7 +320,7 @@ public class CacheManager implements BroadcastInterface {
                 }
 
                 for (Class<? extends BaseModel> clazz : GROUPED_CLASSES) {
-                    for (Permission permission : storage.getPermissions(object.getClass(), clazz)) {
+                    for (Permission permission : storage.getPermissions(object.getClass(), clazz)) { // &line[getPermissions]
                         if (permission.getOwnerId() == object.getId()) {
                             invalidatePermission(
                                     object.getClass(), object.getId(), clazz, permission.getPropertyId(), true);

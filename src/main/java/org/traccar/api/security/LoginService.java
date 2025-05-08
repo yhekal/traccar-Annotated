@@ -60,6 +60,7 @@ public class LoginService {
         forceOpenId = config.getBoolean(Keys.OPENID_FORCE);
     }
 
+    // &begin[login_credentials]
     public LoginResult login(
             String scheme, String credentials) throws StorageException, GeneralSecurityException, IOException {
         switch (scheme.toLowerCase()) {
@@ -73,12 +74,14 @@ public class LoginService {
                 throw new SecurityException("Unsupported authorization scheme");
         }
     }
+    // &end[login_credentials]
 
+// &begin[login_token]
     public LoginResult login(String token) throws StorageException, GeneralSecurityException, IOException {
         if (serviceAccountToken != null && serviceAccountToken.equals(token)) {
             return new LoginResult(new ServiceAccountUser());
         }
-        TokenManager.TokenData tokenData = tokenManager.verifyToken(token);
+        TokenManager.TokenData tokenData = tokenManager.verifyToken(token); // &line[verifyToken]
         User user = storage.getObject(User.class, new Request(
                 new Columns.All(), new Condition.Equals("id", tokenData.getUserId())));
         if (user != null) {
@@ -86,7 +89,8 @@ public class LoginService {
         }
         return new LoginResult(user, tokenData.getExpiration());
     }
-
+    // &end[login_token]
+// &begin[login_email]
     public LoginResult login(String email, String password, Integer code) throws StorageException {
         if (forceOpenId) {
             return null;
@@ -100,9 +104,9 @@ public class LoginService {
                         new Condition.Equals("login", email))));
         if (user != null) {
             if (ldapProvider != null && user.getLogin() != null && ldapProvider.login(user.getLogin(), password)
-                    || !forceLdap && user.isPasswordValid(password)) {
-                checkUserCode(user, code);
-                checkUserEnabled(user);
+                    || !forceLdap && user.isPasswordValid(password)) { // &line[isPasswordValid]
+                checkUserCode(user, code); // &line[checkUserCode]
+                checkUserEnabled(user); // &line[checkUserEnabled]
                 return new LoginResult(user);
             }
         } else {
@@ -115,7 +119,8 @@ public class LoginService {
         }
         return null;
     }
-
+    // &end[login_email]
+// &begin[login_email_administrator]
     public LoginResult login(String email, String name, boolean administrator) throws StorageException {
         User user = storage.getObject(User.class, new Request(
             new Columns.All(),
@@ -130,28 +135,32 @@ public class LoginService {
             user.setAdministrator(administrator);
             user.setId(storage.addObject(user, new Request(new Columns.Exclude("id"))));
         }
-        checkUserEnabled(user);
+        checkUserEnabled(user); // &line[checkUserEnabled]
         return new LoginResult(user);
     }
-
+    // &end[login_email_administrator]
+// &begin[checkUserEnabled]
     private void checkUserEnabled(User user) throws SecurityException {
         if (user == null) {
             throw new SecurityException("Unknown account");
         }
         user.checkDisabled();
     }
+    // &end[checkUserEnabled]
 
+// &begin[checkUserCode]
     private void checkUserCode(User user, Integer code) throws SecurityException {
-        String key = user.getTotpKey();
+        String key = user.getTotpKey();  // &line[getTotpKey]
         if (key != null && !key.isEmpty()) {
             if (code == null) {
                 throw new CodeRequiredException();
             }
             GoogleAuthenticator authenticator = new GoogleAuthenticator();
-            if (!authenticator.authorize(key, code)) {
+            if (!authenticator.authorize(key, code)) { // &line[authenticator_authorize]
                 throw new SecurityException("User authorization failed");
             }
         }
     }
+    // &end[checkUserCode]
 
 }

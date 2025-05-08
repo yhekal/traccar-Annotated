@@ -331,7 +331,7 @@ public class MeitrackProtocolDecoder extends BaseProtocolDecoder {
             StringBuilder command = new StringBuilder("@@");
             command.append(flag).append(27 + positions.size() / 10).append(",");
             command.append(imei).append(",CCC,").append(positions.size()).append("*");
-            command.append(Checksum.sum(command.toString()));
+            command.append(Checksum.sum(command.toString())); // &line[Checksum_sum]
             command.append("\r\n");
             channel.writeAndFlush(new NetworkMessage(command.toString(), remoteAddress));
         }
@@ -500,7 +500,7 @@ public class MeitrackProtocolDecoder extends BaseProtocolDecoder {
             String content = "D00," + file + "," + index;
             int length = 1 + imei.length() + 1 + content.length() + 5;
             String response = String.format("@@O%02d,%s,%s*", length, imei, content);
-            response += Checksum.sum(response) + "\r\n";
+            response += Checksum.sum(response) + "\r\n"; // &line[Checksum_sum]
             channel.writeAndFlush(new NetworkMessage(response, remoteAddress));
         }
     }
@@ -520,7 +520,7 @@ public class MeitrackProtocolDecoder extends BaseProtocolDecoder {
             case "AAC" -> {
                 if (channel != null) {
                     String response = String.format("@@z27,%s,AAC,1*", imei);
-                    response += Checksum.sum(response) + "\r\n";
+                    response += Checksum.sum(response) + "\r\n"; // &line[Checksum_sum]
                     channel.writeAndFlush(new NetworkMessage(response, remoteAddress));
                 }
                 yield null;

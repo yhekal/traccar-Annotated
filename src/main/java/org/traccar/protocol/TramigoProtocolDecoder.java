@@ -153,7 +153,7 @@ public class TramigoProtocolDecoder extends BaseProtocolDecoder {
             response.writeShortLE(index);
             response.writeShortLE(0); // success
 
-            response.setShortLE(3, Checksum.crc16(Checksum.CRC16_CCITT_FALSE, response.nioBuffer()));
+            response.setShortLE(3, Checksum.crc16(Checksum.CRC16_CCITT_FALSE, response.nioBuffer())); // &line[Checksum_crc16]
 
             channel.writeAndFlush(new NetworkMessage(response, channel.remoteAddress()));
         }

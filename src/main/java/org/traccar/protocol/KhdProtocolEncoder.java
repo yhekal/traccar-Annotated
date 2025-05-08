@@ -62,7 +62,7 @@ public class KhdProtocolEncoder extends BaseProtocolEncoder {
             buf.writeBytes(content);
         }
 
-        buf.writeByte(Checksum.xor(buf.nioBuffer()));
+        buf.writeByte(Checksum.xor(buf.nioBuffer())); // &line[Checksum_xor]
         buf.writeByte(0x0D); // ending
 
         return buf;

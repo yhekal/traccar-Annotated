@@ -16,8 +16,6 @@
  */
 package org.traccar.api.resource;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.core.Context;
 import org.traccar.api.BaseResource;
 import org.traccar.helper.LogAction;
 import org.traccar.model.Permission;
@@ -47,44 +45,42 @@ public class PermissionsResource  extends BaseResource {
     @Inject
     private CacheManager cacheManager;
 
-    @Inject
-    private LogAction actionLogger;
-
-    @Context
-    private HttpServletRequest request;
-
+// &begin[checkPermission_Custom]
     private void checkPermission(Permission permission) throws StorageException {
-        if (permissionsService.notAdmin(getUserId())) {
-            permissionsService.checkPermission(permission.getOwnerClass(), getUserId(), permission.getOwnerId());
-            permissionsService.checkPermission(permission.getPropertyClass(), getUserId(), permission.getPropertyId());
+
+        if (permissionsService.notAdmin(getUserId())) { // &line[notAdmin]
+            permissionsService.checkPermission(permission.getOwnerClass(), getUserId(), permission.getOwnerId()); // &line[checkPermission]
+            permissionsService.checkPermission(permission.getPropertyClass(), getUserId(), permission.getPropertyId()); // &line[checkPermission]
         }
     }
-
+    // &end[checkPermission_Custom]
+    // &begin[checkPermissionTypes]
     private void checkPermissionTypes(List<LinkedHashMap<String, Long>> entities) {
         Set<String> keys = null;
         for (LinkedHashMap<String, Long> entity: entities) {
-            if (keys != null & !entity.keySet().equals(keys)) {
+            if (keys != null & !entity.keySet().equals(keys)) { // &line[keySet]
                 throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).build());
             }
             keys = entity.keySet();
         }
     }
+    // &end[checkPermissionTypes]
 
     @Path("bulk")
     @POST
     public Response add(List<LinkedHashMap<String, Long>> entities) throws Exception {
-        permissionsService.checkRestriction(getUserId(), UserRestrictions::getReadonly);
-        checkPermissionTypes(entities);
+        permissionsService.checkRestriction(getUserId(), UserRestrictions::getReadonly); // &line[checkRestriction]
+        checkPermissionTypes(entities); // &line[checkPermissionTypes]
         for (LinkedHashMap<String, Long> entity: entities) {
             Permission permission = new Permission(entity);
-            checkPermission(permission);
-            storage.addPermission(permission);
-            cacheManager.invalidatePermission(
+            checkPermission(permission); // &line[checkPermission_Custom]
+            storage.addPermission(permission); // &line[addPermission]
+            cacheManager.invalidatePermission( // &line[invalidatePermission]
                     true,
                     permission.getOwnerClass(), permission.getOwnerId(),
                     permission.getPropertyClass(), permission.getPropertyId(),
                     true);
-            actionLogger.link(request, getUserId(),
+            LogAction.link(getUserId(),
                     permission.getOwnerClass(), permission.getOwnerId(),
                     permission.getPropertyClass(), permission.getPropertyId());
         }
@@ -99,18 +95,18 @@ public class PermissionsResource  extends BaseResource {
     @DELETE
     @Path("bulk")
     public Response remove(List<LinkedHashMap<String, Long>> entities) throws Exception {
-        permissionsService.checkRestriction(getUserId(), UserRestrictions::getReadonly);
-        checkPermissionTypes(entities);
+        permissionsService.checkRestriction(getUserId(), UserRestrictions::getReadonly);  // &line[checkRestriction]
+        checkPermissionTypes(entities); // &line[checkPermissionTypes]
         for (LinkedHashMap<String, Long> entity: entities) {
             Permission permission = new Permission(entity);
-            checkPermission(permission);
-            storage.removePermission(permission);
-            cacheManager.invalidatePermission(
+            checkPermission(permission); // &line[checkPermission_Custom]
+            storage.removePermission(permission); // &line[removePermission]
+            cacheManager.invalidatePermission( // &line[invalidatePermission]
                     true,
                     permission.getOwnerClass(), permission.getOwnerId(),
                     permission.getPropertyClass(), permission.getPropertyId(),
                     false);
-            actionLogger.unlink(request, getUserId(),
+            LogAction.unlink(getUserId(),
                     permission.getOwnerClass(), permission.getOwnerId(),
                     permission.getPropertyClass(), permission.getPropertyId());
         }

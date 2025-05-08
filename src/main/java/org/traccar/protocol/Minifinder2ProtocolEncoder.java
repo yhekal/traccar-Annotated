@@ -37,7 +37,7 @@ public class Minifinder2ProtocolEncoder extends BaseProtocolEncoder {
         buf.writeByte(0xAB); // header
         buf.writeByte(0x00); // properties
         buf.writeShortLE(content.readableBytes());
-        buf.writeShortLE(Checksum.crc16(Checksum.CRC16_XMODEM, content.nioBuffer()));
+        buf.writeShortLE(Checksum.crc16(Checksum.CRC16_XMODEM, content.nioBuffer())); // &line[Checksum_crc16]
         buf.writeShortLE(1); // index
         buf.writeBytes(content);
 

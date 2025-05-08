@@ -215,7 +215,7 @@ public class L100ProtocolDecoder extends BaseProtocolDecoder {
         if (type == 1) {
             if (channel != null) {
                 String response = "@" + imei + ",00," + index + ",";
-                response += "*" + (char) Checksum.xor(response);
+                response += "*" + (char) Checksum.xor(response); // &line[Checksum_xor]
                 channel.writeAndFlush(new NetworkMessage(response, remoteAddress));
             }
             return null;

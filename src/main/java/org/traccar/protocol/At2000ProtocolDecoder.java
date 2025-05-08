@@ -49,6 +49,7 @@ public class At2000ProtocolDecoder extends BaseProtocolDecoder {
     public static final int MSG_TRACK_RESPONSE = 0x89;
     public static final int MSG_SESSION_END = 0x0c;
 
+
     private Cipher cipher;
 
     private static void sendRequest(Channel channel) {
@@ -62,6 +63,7 @@ public class At2000ProtocolDecoder extends BaseProtocolDecoder {
     }
 
     @Override
+            // &begin[decode]
     protected Object decode(
             Channel channel, SocketAddress remoteAddress, Object msg) throws Exception {
 
@@ -84,11 +86,11 @@ public class At2000ProtocolDecoder extends BaseProtocolDecoder {
                 buf.readBytes(iv);
                 IvParameterSpec ivSpec = new IvParameterSpec(iv);
 
-                SecretKeySpec keySpec = new SecretKeySpec(
-                        DataConverter.parseHex("000102030405060708090a0b0c0d0e0f"), "AES");
+                SecretKeySpec keySpec = new SecretKeySpec( // &line[keySpec]
+                        DataConverter.parseHex("000102030405060708090a0b0c0d0e0f"), "AES"); // &line[AES]
 
-                cipher = Cipher.getInstance("AES/CBC/NoPadding");
-                cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
+                cipher = Cipher.getInstance("AES/CBC/NoPadding"); // &line[AES]
+                cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec); // &line[keySpec]
 
                 byte[] data = new byte[BLOCK_LENGTH];
                 buf.readBytes(data);
@@ -167,5 +169,5 @@ public class At2000ProtocolDecoder extends BaseProtocolDecoder {
 
         return null;
     }
-
+// &end[decode]
 }

@@ -65,7 +65,8 @@ public abstract class TrackerClient implements TrackerConnector {
             protected void addTransportHandlers(PipelineBuilder pipeline) {
                 try {
                     if (isSecure()) {
-                        SSLEngine engine = SSLContext.getDefault().createSSLEngine();
+
+                        SSLEngine engine = SSLContext.getDefault().createSSLEngine(); // &line[createSSLEngine]
                         engine.setUseClientMode(true);
                         pipeline.addLast(new SslHandler(engine));
                     }

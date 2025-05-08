@@ -32,7 +32,7 @@ public class MeitrackProtocolEncoder extends StringProtocolEncoder {
         String uniqueId = getUniqueId(command.getDeviceId());
         int length = 1 + uniqueId.length() + 1 + content.length() + 5;
         String result = String.format("@@A%02d,%s,%s*", length, uniqueId, content);
-        result += Checksum.sum(result) + "\r\n";
+        result += Checksum.sum(result) + "\r\n"; // &line[Checksum_sum]
         return result;
     }
 

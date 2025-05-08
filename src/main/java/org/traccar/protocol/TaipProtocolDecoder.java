@@ -307,7 +307,7 @@ public class TaipProtocolDecoder extends BaseProtocolDecoder {
                         }
                         String model = getDeviceModel(deviceSession);
                         boolean lantrix = model != null && model.toUpperCase().startsWith("LANTRIX");
-                        int checksum = Checksum.xor(lantrix ? response : response + "*");
+                        int checksum = Checksum.xor(lantrix ? response : response + "*"); // &line[Checksum_xor]
                         response += String.format("*%02X", checksum) + "<";
                     }
                     channel.writeAndFlush(new NetworkMessage(response, remoteAddress));

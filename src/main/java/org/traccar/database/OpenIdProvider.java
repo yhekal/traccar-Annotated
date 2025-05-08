@@ -18,7 +18,6 @@ package org.traccar.database;
 import org.traccar.config.Config;
 import org.traccar.config.Keys;
 import org.traccar.api.security.LoginService;
-import org.traccar.helper.LogAction;
 import org.traccar.model.User;
 import org.traccar.storage.StorageException;
 import org.traccar.helper.SessionHelper;
@@ -77,16 +76,12 @@ public class OpenIdProvider {
     private final String groupsClaimName;
 
     private final LoginService loginService;
-    private final LogAction actionLogger;
 
     @Inject
-    public OpenIdProvider(
-            Config config, LoginService loginService, LogAction actionLogger,
-            HttpClient httpClient, ObjectMapper objectMapper)
+    public OpenIdProvider(Config config, LoginService loginService, HttpClient httpClient, ObjectMapper objectMapper)
         throws InterruptedException, IOException, URISyntaxException {
 
         this.loginService = loginService;
-        this.actionLogger = actionLogger;
 
         force = config.getBoolean(Keys.OPENID_FORCE);
         clientId = new ClientID(config.getString(Keys.OPENID_CLIENT_ID));
@@ -138,7 +133,7 @@ public class OpenIdProvider {
                 .build()
                 .toURI();
     }
-
+    // &begin[getToken]
     private OIDCTokenResponse getToken(AuthorizationCode code)
             throws IOException, ParseException, GeneralSecurityException {
         AuthorizationGrant codeGrant = new AuthorizationCodeGrant(code, callbackUrl);
@@ -146,14 +141,17 @@ public class OpenIdProvider {
 
         HTTPResponse tokenResponse = tokenRequest.toHTTPRequest().send();
         TokenResponse token = OIDCTokenResponseParser.parse(tokenResponse);
+
         if (!token.indicatesSuccess()) {
             throw new GeneralSecurityException("Unable to authenticate with the OpenID Connect provider.");
         }
 
         return (OIDCTokenResponse) token.toSuccessResponse();
     }
+    // &end[getToken]
 
     private UserInfo getUserInfo(BearerAccessToken token) throws IOException, ParseException, GeneralSecurityException {
+
         HTTPResponse httpResponse = new UserInfoRequest(userInfoUrl, token)
                 .toHTTPRequest()
                 .send();
@@ -199,7 +197,7 @@ public class OpenIdProvider {
         User user = loginService.login(
                 userInfo.getEmailAddress(), userInfo.getName(), administrator).getUser();
 
-        SessionHelper.userLogin(actionLogger, request, user, null);
+        SessionHelper.userLogin(request, user, null);
 
         return baseUrl.resolve("?openid=success");
     }

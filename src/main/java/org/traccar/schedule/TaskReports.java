@@ -58,13 +58,11 @@ public class TaskReports extends SingleScheduleTask {
 
     private static final long CHECK_PERIOD_MINUTES = 15;
 
-    private final LogAction actionLogger;
     private final Storage storage;
     private final Injector injector;
 
     @Inject
-    public TaskReports(LogAction actionLogger, Storage storage, Injector injector) {
-        this.actionLogger = actionLogger;
+    public TaskReports(Storage storage, Injector injector) {
         this.storage = storage;
         this.injector = injector;
     }
@@ -118,7 +116,7 @@ public class TaskReports extends SingleScheduleTask {
         ReportMailer reportMailer = injector.getInstance(ReportMailer.class);
 
         for (User user : users) {
-            actionLogger.report(null, user.getId(), true, report.getType(), from, to, deviceIds, groupIds);
+            LogAction.report(user.getId(), true, report.getType(), from, to, deviceIds, groupIds);
             switch (report.getType()) {
                 case "events" -> {
                     var eventsReportProvider = injector.getInstance(EventsReportProvider.class);

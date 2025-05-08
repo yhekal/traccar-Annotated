@@ -559,7 +559,7 @@ public class TotemProtocolDecoder extends BaseProtocolDecoder {
         if (channel != null) {
             if (sentence.charAt(2) == '0') {
                 String response = "$$0014AA" + sentence.substring(sentence.length() - 6, sentence.length() - 2);
-                response += String.format("%02X", Checksum.xor(response)).toUpperCase();
+                response += String.format("%02X", Checksum.xor(response)).toUpperCase(); // &line[Checksum_xor]
                 channel.writeAndFlush(new NetworkMessage(response, remoteAddress));
             } else {
                 channel.writeAndFlush(new NetworkMessage("ACK OK\r\n", remoteAddress));

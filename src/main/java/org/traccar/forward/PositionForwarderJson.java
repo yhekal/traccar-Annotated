@@ -47,11 +47,6 @@ public class PositionForwarderJson implements PositionForwarder {
     @Override
     public void forward(PositionData positionData, ResultHandler resultHandler) {
         String url = AttributeUtil.lookup(cacheManager, Keys.FORWARD_URL, positionData.getDevice().getId());
-        if (url.isBlank()) {
-            resultHandler.onResult(true, null);
-            return;
-        }
-
         var requestBuilder = client.target(url).request();
 
         MediaType mediaType = MediaType.APPLICATION_JSON_TYPE;

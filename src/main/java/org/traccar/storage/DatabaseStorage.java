@@ -135,6 +135,7 @@ public class DatabaseStorage extends Storage {
     }
 
     @Override
+// &begin[getPermissions]
     public List<Permission> getPermissions(
             Class<? extends BaseModel> ownerClass, long ownerId,
             Class<? extends BaseModel> propertyClass, long propertyId) throws StorageException {
@@ -143,6 +144,7 @@ public class DatabaseStorage extends Storage {
         var conditions = new LinkedList<Condition>();
         if (ownerId > 0) {
             conditions.add(new Condition.Equals(Permission.getKey(ownerClass), ownerId));
+
         }
         if (propertyId > 0) {
             conditions.add(new Condition.Equals(Permission.getKey(propertyClass), propertyId));
@@ -159,8 +161,9 @@ public class DatabaseStorage extends Storage {
             throw new StorageException(e);
         }
     }
-
+    // &end[getPermissions]
     @Override
+// &begin[addPermission]
     public void addPermission(Permission permission) throws StorageException {
         StringBuilder query = new StringBuilder("INSERT INTO ");
         query.append(permission.getStorageName());
@@ -177,8 +180,9 @@ public class DatabaseStorage extends Storage {
             throw new StorageException(e);
         }
     }
-
+    // &end[addPermission]
     @Override
+// &begin[removePermission]
     public void removePermission(Permission permission) throws StorageException {
         StringBuilder query = new StringBuilder("DELETE FROM ");
         query.append(permission.getStorageName());
@@ -195,7 +199,7 @@ public class DatabaseStorage extends Storage {
             throw new StorageException(e);
         }
     }
-
+    // &end[removePermission]
     private String getStorageName(Class<?> clazz) throws StorageException {
         StorageName storageName = clazz.getAnnotation(StorageName.class);
         if (storageName == null) {
@@ -311,6 +315,7 @@ public class DatabaseStorage extends Storage {
         return result.toString();
     }
 
+// &begin[formatPermissionQuery]
     private String formatPermissionQuery(Condition.Permission condition) throws StorageException {
         StringBuilder result = new StringBuilder();
 
@@ -396,5 +401,6 @@ public class DatabaseStorage extends Storage {
 
         return result.toString();
     }
+    // &end[formatPermissionQuery]
 
 }

@@ -55,7 +55,7 @@ public class GeocoderTest {
     public void testGeocodeFarm() {
         Geocoder geocoder = new GeocodeFarmGeocoder(client, null, null, 0, new AddressFormat());
         String address = geocoder.getAddress(34.116302, -118.051519, null);
-        assertEquals("604 Estrella Ave, Arcadia, CA, United States", address);
+        assertEquals("Estrella Avenue, Arcadia, California, United States", address);
     }
 
     @Disabled

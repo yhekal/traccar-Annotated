@@ -61,10 +61,10 @@ public class MediaFilter implements Filter {
 
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         try {
-            HttpSession session = ((HttpServletRequest) request).getSession(false);
+            HttpSession session = ((HttpServletRequest) request).getSession(false); // &line[getSession]
             Long userId = null;
             if (session != null) {
-                userId = (Long) session.getAttribute(SessionHelper.USER_ID_KEY);
+                userId = (Long) session.getAttribute(SessionHelper.USER_ID_KEY); // &line[getAttribute]
                 if (userId != null) {
                     statisticsManager.registerRequest(userId);
                 }
@@ -80,15 +80,15 @@ public class MediaFilter implements Filter {
                 Device device = storage.getObject(Device.class, new Request(
                         new Columns.All(), new Condition.Equals("uniqueId", parts[1])));
                 if (device != null) {
-                    permissionsServiceProvider.get().checkPermission(Device.class, userId, device.getId());
+                    permissionsServiceProvider.get().checkPermission(Device.class, userId, device.getId()); // &line[checkPermission]
                     chain.doFilter(request, response);
                     return;
                 }
             }
 
-            httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
+            httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN); // &line[sendError]
         } catch (SecurityException | StorageException e) {
-            httpResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            httpResponse.setStatus(HttpServletResponse.SC_FORBIDDEN); // &line[setStatus]
             e.printStackTrace(httpResponse.getWriter());
         }
     }

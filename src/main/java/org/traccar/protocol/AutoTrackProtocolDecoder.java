@@ -84,7 +84,7 @@ public class AutoTrackProtocolDecoder extends BaseProtocolDecoder {
             response.writeByte(MSG_TELEMETRY_CONFIRM);
             response.writeShortLE(2); // length
             response.writeShortLE(index);
-            response.writeShort(Checksum.crc16(Checksum.CRC16_XMODEM, response.nioBuffer()));
+            response.writeShort(Checksum.crc16(Checksum.CRC16_XMODEM, response.nioBuffer())); // &line[Checksum_crc16]
             channel.writeAndFlush(new NetworkMessage(response, remoteAddress));
         }
 
@@ -119,7 +119,7 @@ public class AutoTrackProtocolDecoder extends BaseProtocolDecoder {
                     response.writeBytes(ByteBufUtil.decodeHexDump(imei));
                     response.writeShortLE(fuelConst);
                     response.writeShortLE(tripConst);
-                    response.writeShort(Checksum.crc16(Checksum.CRC16_XMODEM, response.nioBuffer()));
+                    response.writeShort(Checksum.crc16(Checksum.CRC16_XMODEM, response.nioBuffer())); // &line[Checksum_crc16]
                     channel.writeAndFlush(new NetworkMessage(response, remoteAddress));
                 }
                 return null;

@@ -26,7 +26,7 @@ import jakarta.ws.rs.core.SecurityContext;
 public class BaseResource {
 
     @Context
-    private SecurityContext securityContext;
+    private SecurityContext securityContext;  // &line[SecurityContext]
 
     @Inject
     protected Storage storage;

@@ -38,7 +38,7 @@ public class RuptelaProtocolEncoder extends BaseProtocolEncoder {
         buf.writeShort(1 + content.readableBytes());
         buf.writeByte(100 + type);
         buf.writeBytes(content);
-        buf.writeShort(Checksum.crc16(Checksum.CRC16_KERMIT, buf.nioBuffer(2, buf.writerIndex() - 2)));
+        buf.writeShort(Checksum.crc16(Checksum.CRC16_KERMIT, buf.nioBuffer(2, buf.writerIndex() - 2))); // &line[Checksum_crc16]
 
         return buf;
     }

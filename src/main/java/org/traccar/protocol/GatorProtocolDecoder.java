@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 - 2025 Anton Tananaev (anton@traccar.org)
+ * Copyright 2013 - 2020 Anton Tananaev (anton@traccar.org)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,9 @@
 package org.traccar.protocol;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import org.traccar.BaseProtocolDecoder;
-import org.traccar.helper.BitUtil;
 import org.traccar.session.DeviceSession;
 import org.traccar.NetworkMessage;
 import org.traccar.Protocol;
@@ -75,7 +73,7 @@ public class GatorProtocolDecoder extends BaseProtocolDecoder {
             response.writeByte(checksum);
             response.writeByte(type);
             response.writeByte(0); // subtype
-            response.writeByte(Checksum.xor(response.nioBuffer(2, response.writerIndex())));
+            response.writeByte(Checksum.xor(response.nioBuffer(2, response.writerIndex()))); // &line[Checksum_xor]
             response.writeByte(0x0D);
             channel.writeAndFlush(new NetworkMessage(response, remoteAddress));
         }
@@ -91,28 +89,9 @@ public class GatorProtocolDecoder extends BaseProtocolDecoder {
         int type = buf.readUnsignedByte();
         buf.readUnsignedShort(); // length
 
-        boolean modelM588 = false;
-        String imei = null;
-        if (buf.readableBytes() > 8) {
-            imei = ByteBufUtil.hexDump(buf.slice(buf.readerIndex(), 8)).substring(0, 15);
-            if (imei.matches("\\d+")) {
-                long number = Long.parseLong(imei.substring(0, 14));
-                if (Checksum.luhn(number) == Long.parseLong(imei.substring(14))) {
-                    modelM588 = true;
-                }
-            }
-        }
-
-        String[] ids;
-        if (modelM588) {
-            ids = new String[] {imei};
-            buf.skipBytes(8);
-        } else {
-            String id = decodeId(
-                    buf.readUnsignedByte(), buf.readUnsignedByte(),
-                    buf.readUnsignedByte(), buf.readUnsignedByte());
-            ids = new String[] {"1" + id, id};
-        }
+        String id = decodeId(
+                buf.readUnsignedByte(), buf.readUnsignedByte(),
+                buf.readUnsignedByte(), buf.readUnsignedByte());
 
         sendResponse(channel, remoteAddress, type, buf.getByte(buf.writerIndex() - 2));
 
@@ -121,7 +100,7 @@ public class GatorProtocolDecoder extends BaseProtocolDecoder {
 
             Position position = new Position(getProtocolName());
 
-            DeviceSession deviceSession = getDeviceSession(channel, remoteAddress, ids);
+            DeviceSession deviceSession = getDeviceSession(channel, remoteAddress, "1" + id, id);
             if (deviceSession == null) {
                 return null;
             }
@@ -152,25 +131,6 @@ public class GatorProtocolDecoder extends BaseProtocolDecoder {
             position.set(Position.PREFIX_ADC + 2, buf.readUnsignedByte() + buf.readUnsignedByte() * 0.01);
 
             position.set(Position.KEY_ODOMETER, buf.readUnsignedInt());
-
-            if (modelM588 && buf.readableBytes() >= 5 + 2) {
-                buf.readUnsignedShort();
-                buf.readUnsignedShort();
-                int alarm = buf.readUnsignedByte();
-                position.addAlarm(BitUtil.check(alarm, 0) ? Position.ALARM_ACCELERATION : null);
-                position.addAlarm(BitUtil.check(alarm, 1) ? Position.ALARM_BRAKING : null);
-                position.addAlarm(BitUtil.check(alarm, 2) ? Position.ALARM_CORNERING : null);
-            }
-
-            if (type == MSG_ALARM_DATA) {
-                int alarm1 = buf.readUnsignedByte();
-                position.addAlarm(BitUtil.check(alarm1, 0) ? Position.ALARM_BRAKING : null);
-                position.addAlarm(BitUtil.check(alarm1, 5) ? Position.ALARM_ACCELERATION : null);
-
-                int alarm2 = buf.readUnsignedByte();
-                position.addAlarm(BitUtil.check(alarm2, 1) ? Position.ALARM_OVERSPEED : null);
-                position.addAlarm(BitUtil.check(alarm2, 4) ? Position.ALARM_CORNERING : null);
-            }
 
             return position;
         }

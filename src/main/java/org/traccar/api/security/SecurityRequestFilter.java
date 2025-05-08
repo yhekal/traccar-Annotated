@@ -38,6 +38,7 @@ import java.lang.reflect.Method;
 import java.security.GeneralSecurityException;
 import java.util.Date;
 
+// &begin[SecurityRequestFilter]
 public class SecurityRequestFilter implements ContainerRequestFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SecurityRequestFilter.class);
@@ -58,13 +59,14 @@ public class SecurityRequestFilter implements ContainerRequestFilter {
     private Injector injector;
 
     @Override
+            // &begin[filter]
     public void filter(ContainerRequestContext requestContext) {
 
         if (requestContext.getMethod().equals("OPTIONS")) {
             return;
         }
 
-        SecurityContext securityContext = null;
+        SecurityContext securityContext = null;  // &line[SecurityContext]
 
         try {
 
@@ -73,27 +75,27 @@ public class SecurityRequestFilter implements ContainerRequestFilter {
 
                 try {
                     String[] auth = authHeader.split(" ");
-                    LoginResult loginResult = loginService.login(auth[0], auth[1]);
+                    LoginResult loginResult = loginService.login(auth[0], auth[1]); // &line[login]
                     if (loginResult != null) {
                         User user = loginResult.getUser();
                         statisticsManager.registerRequest(user.getId());
-                        securityContext = new UserSecurityContext(
+                        securityContext = new UserSecurityContext( // &line[securityContext]
                                 new UserPrincipal(user.getId(), loginResult.getExpiration()));
                     }
                 } catch (StorageException | GeneralSecurityException | IOException e) {
                     throw new WebApplicationException(e);
                 }
 
-            } else if (request.getSession() != null) {
+            } else if (request.getSession() != null) { // &line[getSession]
 
-                Long userId = (Long) request.getSession().getAttribute(SessionHelper.USER_ID_KEY);
+                Long userId = (Long) request.getSession().getAttribute(SessionHelper.USER_ID_KEY); // &line[getSession]
                 Date expiration = (Date) request.getSession().getAttribute(SessionHelper.EXPIRATION_KEY);
                 if (userId != null) {
                     User user = injector.getInstance(PermissionsService.class).getUser(userId);
                     if (user != null) {
                         user.checkDisabled();
                         statisticsManager.registerRequest(userId);
-                        securityContext = new UserSecurityContext(new UserPrincipal(userId, expiration));
+                        securityContext = new UserSecurityContext(new UserPrincipal(userId, expiration));  // &line[securityContext]
                     }
                 }
 
@@ -104,7 +106,7 @@ public class SecurityRequestFilter implements ContainerRequestFilter {
         }
 
         if (securityContext != null) {
-            requestContext.setSecurityContext(securityContext);
+            requestContext.setSecurityContext(securityContext); // &line[setSecurityContext]
         } else {
             Method method = resourceInfo.getResourceMethod();
             if (!method.isAnnotationPresent(PermitAll.class)) {
@@ -118,5 +120,6 @@ public class SecurityRequestFilter implements ContainerRequestFilter {
         }
 
     }
-
+// &end[filter]
 }
+// &end[SecurityRequestFilter]

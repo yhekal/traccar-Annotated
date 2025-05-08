@@ -41,7 +41,7 @@ public class BceProtocolEncoder extends BaseProtocolEncoder {
             buf.writeByte(0xFF); // index
             buf.writeByte(0x00); // form id
             buf.writeShortLE(Integer.parseInt(command.getString(Command.KEY_DATA)) > 0 ? 0x0055 : 0x0000);
-            buf.writeByte(Checksum.sum(buf.nioBuffer()));
+            buf.writeByte(Checksum.sum(buf.nioBuffer())); // &line[Checksum_sum]
 
             return buf;
         } else {

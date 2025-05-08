@@ -41,7 +41,7 @@ public class Xexun2ProtocolEncoder extends BaseProtocolEncoder {
         buf.writeShort(1); // index
         buf.writeBytes(DataConverter.parseHex(uniqueId + "0"));
         buf.writeShort(message.readableBytes());
-        buf.writeShort(Checksum.ip(message.nioBuffer()));
+        buf.writeShort(Checksum.ip(message.nioBuffer())); // &line[Checksum_ip]
         buf.writeBytes(message);
         buf.writeShort(Xexun2ProtocolDecoder.FLAG);
 

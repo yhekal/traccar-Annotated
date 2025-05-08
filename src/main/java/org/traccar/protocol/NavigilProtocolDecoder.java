@@ -70,7 +70,7 @@ public class NavigilProtocolDecoder extends BaseProtocolDecoder {
         header.writeShortLE(MSG_ACKNOWLEDGEMENT);
         header.writeShortLE(header.capacity() + data.capacity());
         header.writeShortLE(0);
-        header.writeShortLE(Checksum.crc16(Checksum.CRC16_CCITT_FALSE, data.nioBuffer()));
+        header.writeShortLE(Checksum.crc16(Checksum.CRC16_CCITT_FALSE, data.nioBuffer())); // &line[Checksum_crc16]
         header.writeIntLE(0);
         header.writeIntLE((int) (System.currentTimeMillis() / 1000) + LEAP_SECONDS_DELTA);
 

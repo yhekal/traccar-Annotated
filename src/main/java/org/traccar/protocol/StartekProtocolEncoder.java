@@ -33,7 +33,7 @@ public class StartekProtocolEncoder extends StringProtocolEncoder {
         String payload = super.formatCommand(command, format, keys);
         int length = 1 + uniqueId.length() + 1 + payload.length();
         String sentence = "$$:" + length + "," + uniqueId + "," + payload;
-        return sentence + Checksum.sum(sentence) + "\r\n";
+        return sentence + Checksum.sum(sentence) + "\r\n"; // &line[Checksum_sum]
     }
 
     @Override

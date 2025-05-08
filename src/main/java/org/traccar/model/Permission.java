@@ -29,7 +29,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.traccar.helper.ClassScanner;
 import org.traccar.storage.QueryIgnore;
 
+// &begin[Permission_Class]
 public class Permission {
+
 
     private static final Map<String, Class<? extends BaseModel>> CLASSES = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
@@ -76,10 +78,11 @@ public class Permission {
     public static Class<? extends BaseModel> getKeyClass(String key) {
         return CLASSES.get(key.substring(0, key.length() - 2));
     }
-
+    // &begin[getKey]
     public static String getKey(Class<?> clazz) {
         return Introspector.decapitalize(clazz.getSimpleName()) + "Id";
     }
+    // &end[getKey]
 
     public static String getStorageName(Class<?> ownerClass, Class<?> propertyClass) {
         String ownerName = ownerClass.getSimpleName();
@@ -134,3 +137,4 @@ public class Permission {
     }
 
 }
+// &end[Permission_Class]

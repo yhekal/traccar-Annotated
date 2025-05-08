@@ -15,8 +15,6 @@
  */
 package org.traccar.api.resource;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.core.Context;
 import org.traccar.api.BaseResource;
 import org.traccar.model.ObjectOperation;
 import org.traccar.config.Config;
@@ -85,12 +83,6 @@ public class ServerResource extends BaseResource {
     @Nullable
     private Geocoder geocoder;
 
-    @Inject
-    private LogAction actionLogger;
-
-    @Context
-    private HttpServletRequest request;
-
     @PermitAll
     @GET
     public Server get() throws StorageException {
@@ -118,7 +110,7 @@ public class ServerResource extends BaseResource {
                 new Columns.Exclude("id"),
                 new Condition.Equals("id", server.getId())));
         cacheManager.invalidateObject(true, Server.class, server.getId(), ObjectOperation.UPDATE);
-        actionLogger.edit(request, getUserId(), server);
+        LogAction.edit(getUserId(), server);
         return Response.ok(server).build();
     }
 

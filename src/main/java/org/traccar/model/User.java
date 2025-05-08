@@ -269,13 +269,15 @@ public class User extends ExtendedModel implements UserRestrictions, Disableable
     }
 
     @QueryIgnore
+            // &begin[setPassword]
     public void setPassword(String password) {
         if (password != null && !password.isEmpty()) {
-            Hashing.HashingResult hashingResult = Hashing.createHash(password);
-            hashedPassword = hashingResult.getHash();
-            salt = hashingResult.getSalt();
+            Hashing.HashingResult hashingResult = Hashing.createHash(password); // &line[createHash]
+            hashedPassword = hashingResult.getHash(); // &line[getHash]
+            salt = hashingResult.getSalt(); // &line[getSalt]
         }
     }
+    // &end[setPassword]
 
     private String hashedPassword;
 
@@ -302,11 +304,11 @@ public class User extends ExtendedModel implements UserRestrictions, Disableable
     public void setSalt(String salt) {
         this.salt = salt;
     }
-
+    // &begin[isPasswordValid]
     public boolean isPasswordValid(String password) {
-        return Hashing.validatePassword(password, hashedPassword, salt);
+        return Hashing.validatePassword(password, hashedPassword, salt);  // &line[validatePassword]
     }
-
+    // &end[isPasswordValid]
     public boolean compare(User other, String... exclusions) {
         if (!EqualsBuilder.reflectionEquals(this, other, "attributes", "hashedPassword", "salt")) {
             return false;

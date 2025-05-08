@@ -44,26 +44,24 @@ public class TeltonikaProtocolEncoder extends BaseProtocolEncoder {
         buf.writeInt(content.length);
         buf.writeBytes(content);
         buf.writeByte(1); // quantity
-        buf.writeInt(Checksum.crc16(Checksum.CRC16_IBM, buf.nioBuffer(8, buf.writerIndex() - 8)));
+        buf.writeInt(Checksum.crc16(Checksum.CRC16_IBM, buf.nioBuffer(8, buf.writerIndex() - 8))); // &line[Checksum_crc16]
 
         return buf;
     }
 
     @Override
     protected Object encodeCommand(Command command) {
-        return switch (command.getType()) {
-            case Command.TYPE_ENGINE_STOP -> encodeContent("setdigout 1\r\n".getBytes(StandardCharsets.US_ASCII));
-            case Command.TYPE_ENGINE_RESUME -> encodeContent("setdigout 0\r\n".getBytes(StandardCharsets.US_ASCII));
-            case Command.TYPE_CUSTOM -> {
-                String data = command.getString(Command.KEY_DATA);
-                if (data.matches("(\\p{XDigit}{2})+")) {
-                    yield encodeContent(DataConverter.parseHex(data));
-                } else {
-                    yield encodeContent((data + "\r\n").getBytes(StandardCharsets.US_ASCII));
-                }
+
+        if (command.getType().equals(Command.TYPE_CUSTOM)) {
+            String data = command.getString(Command.KEY_DATA);
+            if (data.matches("(\\p{XDigit}{2})+")) {
+                return encodeContent(DataConverter.parseHex(data));
+            } else {
+                return encodeContent((data + "\r\n").getBytes(StandardCharsets.US_ASCII));
             }
-            default -> null;
-        };
+        } else {
+            return null;
+        }
     }
 
 }

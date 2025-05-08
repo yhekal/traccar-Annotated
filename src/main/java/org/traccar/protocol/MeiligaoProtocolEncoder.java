@@ -50,7 +50,7 @@ public class MeiligaoProtocolEncoder extends BaseProtocolEncoder {
 
         buf.writeBytes(content);
 
-        buf.writeShort(Checksum.crc16(Checksum.CRC16_CCITT_FALSE, buf.nioBuffer()));
+        buf.writeShort(Checksum.crc16(Checksum.CRC16_CCITT_FALSE, buf.nioBuffer())); // &line[Checksum_crc16]
 
         buf.writeByte('\r');
         buf.writeByte('\n');

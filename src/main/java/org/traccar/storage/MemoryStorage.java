@@ -164,6 +164,7 @@ public class MemoryStorage extends Storage {
     }
 
     @Override
+// &begin[getPermissions]
     public List<Permission> getPermissions(
             Class<? extends BaseModel> ownerClass, long ownerId,
             Class<? extends BaseModel> propertyClass, long propertyId) {
@@ -173,17 +174,19 @@ public class MemoryStorage extends Storage {
                 .map(pair -> new Permission(ownerClass, pair.first(), propertyClass, pair.second()))
                 .collect(Collectors.toList());
     }
-
+    // &end[getPermissions]
     @Override
+// &begin[addPermission]
     public void addPermission(Permission permission) {
         getPermissionsSet(permission.getOwnerClass(), permission.getPropertyClass())
                 .add(new Pair<>(permission.getOwnerId(), permission.getPropertyId()));
     }
-
+    // &end[addPermission]
     @Override
+// &begin[removePermission]
     public void removePermission(Permission permission) {
         getPermissionsSet(permission.getOwnerClass(), permission.getPropertyClass())
                 .remove(new Pair<>(permission.getOwnerId(), permission.getPropertyId()));
     }
-
+// &end[removePermission]
 }

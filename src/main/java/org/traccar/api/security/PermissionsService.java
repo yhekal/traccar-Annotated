@@ -69,39 +69,46 @@ public class PermissionsService {
         }
         return user;
     }
-
+    // &begin[notAdmin]
     public boolean notAdmin(long userId) throws StorageException {
         return !getUser(userId).getAdministrator();
     }
-
+    // &end[notAdmin]
+    // &begin[checkAdmin]
     public void checkAdmin(long userId) throws StorageException, SecurityException {
-        if (!getUser(userId).getAdministrator()) {
+        if (!getUser(userId).getAdministrator()) { // &line[getAdministrator]
             throw new SecurityException("Administrator access required");
         }
     }
+    // &end[checkAdmin]
 
+// &begin[checkManager]
     public void checkManager(long userId) throws StorageException, SecurityException {
-        if (!getUser(userId).getAdministrator() && getUser(userId).getUserLimit() == 0) {
+        if (!getUser(userId).getAdministrator() && getUser(userId).getUserLimit() == 0) { // &line[getAdministrator]
             throw new SecurityException("Manager access required");
         }
     }
+    // &end[checkManager]
 
     public interface CheckRestrictionCallback {
         boolean denied(UserRestrictions userRestrictions);
     }
 
+    // &begin[checkRestriction]
     public void checkRestriction(
             long userId, CheckRestrictionCallback callback) throws StorageException, SecurityException {
-        if (!getUser(userId).getAdministrator()
+        if (!getUser(userId).getAdministrator() // &line[getAdministrator]
                 && (callback.denied(getServer()) || callback.denied(getUser(userId)))) {
             throw new SecurityException("Operation restricted");
         }
     }
+    // &end[checkRestriction]
 
+    // &begin[checkEdit]
     public void checkEdit(
             long userId, Class<?> clazz, boolean addition, boolean skipReadonly)
             throws StorageException, SecurityException {
-        if (!getUser(userId).getAdministrator()) {
+        if (!getUser(userId).getAdministrator()) { // &line[getAdministrator]
             boolean denied = false;
             if (!skipReadonly && (getServer().getReadonly() || getUser(userId).getReadonly())) {
                 denied = true;
@@ -122,11 +129,10 @@ public class PermissionsService {
             }
         }
     }
-
     public void checkEdit(
             long userId, BaseModel object, boolean addition, boolean skipReadonly)
             throws StorageException, SecurityException {
-        if (!getUser(userId).getAdministrator()) {
+        if (!getUser(userId).getAdministrator()) { // &line[getAdministrator]
             checkEdit(userId, object.getClass(), addition, skipReadonly);
             if (object instanceof GroupedModel after) {
                 if (after.getGroupId() > 0) {
@@ -168,16 +174,18 @@ public class PermissionsService {
     }
 
     public void checkUser(long userId, long managedUserId) throws StorageException, SecurityException {
-        if (userId != managedUserId && !getUser(userId).getAdministrator()) {
+        if (userId != managedUserId && !getUser(userId).getAdministrator()) { // &line[getAdministrator]
             if (!getUser(userId).getManager()
                     || storage.getPermissions(User.class, userId, ManagedUser.class, managedUserId).isEmpty()) {
                 throw new SecurityException("User access denied");
             }
         }
     }
+    // &end[checkEdit]
 
+// &begin[checkUserUpdate]
     public void checkUserUpdate(long userId, User before, User after) throws StorageException, SecurityException {
-        if (before.getAdministrator() != after.getAdministrator()
+        if (before.getAdministrator() != after.getAdministrator() // &line[getAdministrator]
                 || before.getDeviceLimit() != after.getDeviceLimit()
                 || before.getUserLimit() != after.getUserLimit()) {
             checkAdmin(userId);
@@ -207,6 +215,7 @@ public class PermissionsService {
             checkAdmin(userId);
         }
     }
+    // &end[checkUserUpdate]
 
     public <T extends BaseModel> void checkPermission(
             Class<T> clazz, long userId, long objectId) throws StorageException, SecurityException {

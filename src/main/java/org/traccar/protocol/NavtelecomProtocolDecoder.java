@@ -113,8 +113,8 @@ public class NavtelecomProtocolDecoder extends BaseProtocolDecoder {
         buf.writeIntLE(receiver);
         buf.writeIntLE(sender);
         buf.writeShortLE(content.readableBytes());
-        buf.writeByte(Checksum.xor(content.nioBuffer()));
-        buf.writeByte(Checksum.xor(buf.nioBuffer()));
+        buf.writeByte(Checksum.xor(content.nioBuffer())); // &line[Checksum_xor]
+        buf.writeByte(Checksum.xor(buf.nioBuffer())); // &line[Checksum_xor]
         buf.writeBytes(content);
         return buf;
     }
@@ -176,18 +176,6 @@ public class NavtelecomProtocolDecoder extends BaseProtocolDecoder {
                 }
 
                 sendResponse(channel, remoteAddress, receiver, sender, payload);
-
-            } else if (type.startsWith("*@C")) {
-
-                DeviceSession deviceSession = getDeviceSession(channel, remoteAddress);
-                if (deviceSession == null) {
-                    return null;
-                }
-
-                Position position = new Position(getProtocolName());
-                position.setDeviceId(deviceSession.getDeviceId());
-                position.set(Position.KEY_RESULT, buf.readCharSequence(length, StandardCharsets.US_ASCII).toString());
-                return position;
 
             }
 
@@ -446,7 +434,7 @@ public class NavtelecomProtocolDecoder extends BaseProtocolDecoder {
                     ByteBuf response = Unpooled.buffer();
                     response.writeCharSequence(type, StandardCharsets.US_ASCII);
                     response.writeByte(count);
-                    response.writeByte(Checksum.crc8(Checksum.CRC8_EGTS, response.nioBuffer()));
+                    response.writeByte(Checksum.crc8(Checksum.CRC8_EGTS, response.nioBuffer())); // &line[Checksum_crc8]
                     channel.writeAndFlush(new NetworkMessage(response, remoteAddress));
                 }
 

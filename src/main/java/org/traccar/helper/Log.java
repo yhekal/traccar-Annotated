@@ -105,6 +105,7 @@ public final class Log {
         }
 
         @Override
+
         public synchronized void close() throws SecurityException {
             if (writer != null) {
                 try {

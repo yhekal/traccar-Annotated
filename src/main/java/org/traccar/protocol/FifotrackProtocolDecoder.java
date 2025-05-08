@@ -145,7 +145,7 @@ public class FifotrackProtocolDecoder extends BaseProtocolDecoder {
         if (channel != null) {
             int length = 1 + imei.length() + 1 + content.length();
             String response = String.format("##%02d,%s,%s*", length, imei, content);
-            response += Checksum.sum(response) + "\r\n";
+            response += Checksum.sum(response) + "\r\n"; // &line[Checksum_sum]
             channel.writeAndFlush(new NetworkMessage(response, remoteAddress));
         }
     }

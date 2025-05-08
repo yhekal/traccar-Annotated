@@ -97,7 +97,7 @@ public class EgtsProtocolDecoder extends BaseProtocolDecoder {
             record.writeByte(serviceType);
             record.writeBytes(data);
             data.release();
-            int recordChecksum = Checksum.crc16(Checksum.CRC16_CCITT_FALSE, record.nioBuffer());
+            int recordChecksum = Checksum.crc16(Checksum.CRC16_CCITT_FALSE, record.nioBuffer()); // &line[Checksum_crc16]
 
             ByteBuf response = Unpooled.buffer();
             response.writeByte(1); // protocol version
@@ -108,7 +108,7 @@ public class EgtsProtocolDecoder extends BaseProtocolDecoder {
             response.writeShortLE(record.readableBytes());
             response.writeShortLE(packetId++);
             response.writeByte(packetType);
-            response.writeByte(Checksum.crc8(Checksum.CRC8_EGTS, response.nioBuffer()));
+            response.writeByte(Checksum.crc8(Checksum.CRC8_EGTS, response.nioBuffer())); // &line[Checksum_crc8]
             response.writeBytes(record);
             record.release();
             response.writeShortLE(recordChecksum);

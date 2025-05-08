@@ -119,7 +119,7 @@ public class NotificationResource extends ExtendedObjectResource<Notification> {
         if (userIds.isEmpty()) {
             if (permissionsService.notAdmin(getUserId())) {
                 users = storage.getObjects(User.class, new Request(new Columns.All(),
-                        new Condition.Permission(User.class, getUserId(), ManagedUser.class).excludeGroups()));
+                        new Condition.Permission(User.class, getUserId(), ManagedUser.class).excludeGroups())); // &line[excludeGroups]
             } else {
                 users = storage.getObjects(User.class, new Request(new Columns.All()));
             }
@@ -130,7 +130,7 @@ public class NotificationResource extends ExtendedObjectResource<Notification> {
                 conditions.add(new Condition.Equals("id", userId));
                 if (permissionsService.notAdmin(getUserId())) {
                     conditions.add(new Condition.Permission(
-                            User.class, getUserId(), ManagedUser.class).excludeGroups());
+                            User.class, getUserId(), ManagedUser.class).excludeGroups()); // &line[excludeGroups]
                 }
                 users.add(storage.getObject(
                         User.class, new Request(new Columns.All(), Condition.merge(conditions))));

@@ -70,7 +70,7 @@ public class ApelProtocolDecoder extends BaseProtocolDecoder {
         ByteBuf request = Unpooled.buffer(8);
         request.writeShortLE(type);
         request.writeShortLE(0);
-        request.writeIntLE(Checksum.crc32(request.nioBuffer(0, 4)));
+        request.writeIntLE(Checksum.crc32(request.nioBuffer(0, 4))); // &line[Checksum_crc32]
         channel.writeAndFlush(new NetworkMessage(request, channel.remoteAddress()));
     }
 
@@ -83,7 +83,7 @@ public class ApelProtocolDecoder extends BaseProtocolDecoder {
             request.writeShortLE(6);
             request.writeIntLE((int) lastIndex);
             request.writeShortLE(512);
-            request.writeIntLE(Checksum.crc32(request.nioBuffer(0, 10)));
+            request.writeIntLE(Checksum.crc32(request.nioBuffer(0, 10)));  // &line[Checksum_crc32]
             channel.writeAndFlush(new NetworkMessage(request, channel.remoteAddress()));
         }
     }

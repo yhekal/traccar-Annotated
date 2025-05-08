@@ -46,7 +46,7 @@ public class SimpleObjectResource<T extends BaseModel> extends BaseObjectResourc
         var conditions = new LinkedList<Condition>();
 
         if (all) {
-            if (permissionsService.notAdmin(getUserId())) {
+            if (permissionsService.notAdmin(getUserId())) { // &line[notAdmin]
                 conditions.add(new Condition.Permission(User.class, getUserId(), baseClass));
             }
         } else {

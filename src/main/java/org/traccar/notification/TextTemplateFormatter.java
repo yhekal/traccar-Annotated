@@ -59,7 +59,7 @@ public class TextTemplateFormatter {
             velocityContext.put("user", user);
             velocityContext.put("timezone", UserUtil.getTimezone(server, user));
             try {
-                velocityContext.put("token", tokenManager.generateToken(user.getId()));
+                velocityContext.put("token", tokenManager.generateToken(user.getId())); // &line[generateToken]
             } catch (IOException | GeneralSecurityException | StorageException e) {
                 LOGGER.warn("Token generation failed", e);
             }

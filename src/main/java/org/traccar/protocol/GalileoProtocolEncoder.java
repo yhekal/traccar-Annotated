@@ -50,7 +50,7 @@ public class GalileoProtocolEncoder extends BaseProtocolEncoder {
         buf.writeByte(text.length());
         buf.writeBytes(text.getBytes(StandardCharsets.US_ASCII));
 
-        buf.writeShortLE(Checksum.crc16(Checksum.CRC16_MODBUS, buf.nioBuffer(0, buf.writerIndex())));
+        buf.writeShortLE(Checksum.crc16(Checksum.CRC16_MODBUS, buf.nioBuffer(0, buf.writerIndex()))); // &line[Checksum_crc16]
 
         return buf;
     }

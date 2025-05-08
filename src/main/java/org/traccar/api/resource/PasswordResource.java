@@ -75,11 +75,11 @@ public class PasswordResource extends BaseResource {
             @FormParam("token") String token, @FormParam("password") String password)
             throws StorageException, GeneralSecurityException, IOException {
 
-        long userId = tokenManager.verifyToken(token).getUserId();
+        long userId = tokenManager.verifyToken(token).getUserId(); // &line[verifyToken]
         User user = storage.getObject(User.class, new Request(
                 new Columns.All(), new Condition.Equals("id", userId)));
         if (user != null) {
-            user.setPassword(password);
+            user.setPassword(password); // &line[setPassword]
             storage.updateObject(user, new Request(
                     new Columns.Include("hashedPassword", "salt"),
                     new Condition.Equals("id", userId)));

@@ -66,7 +66,7 @@ public class NdtpV6ProtocolDecoder extends BaseProtocolDecoder {
         response.writeBytes(SIGNATURE);
         response.writeShortLE(content.readableBytes());
         response.writeShortLE(NPL_FLAG_CRC); // flags
-        response.writeShort(Checksum.crc16(Checksum.CRC16_MODBUS, content.nioBuffer()));
+        response.writeShort(Checksum.crc16(Checksum.CRC16_MODBUS, content.nioBuffer())); // &line[Checksum_crc16]
         response.writeByte(NPL_TYPE_NPH); // type
         response.writeIntLE(NPL_ADDRESS_SERVER); // peer address
         response.writeShortLE(0); // request id

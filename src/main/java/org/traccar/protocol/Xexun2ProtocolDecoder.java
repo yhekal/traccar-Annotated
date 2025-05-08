@@ -103,7 +103,7 @@ public class Xexun2ProtocolDecoder extends BaseProtocolDecoder {
         int payloadSize = buf.readUnsignedShort() & 0x03ff;
         int checksum = buf.readUnsignedShort();
 
-        if (checksum != Checksum.ip(buf.nioBuffer(buf.readerIndex(), payloadSize))) {
+        if (checksum != Checksum.ip(buf.nioBuffer(buf.readerIndex(), payloadSize))) { // &line[Checksum_ip]
             return null;
         }
 

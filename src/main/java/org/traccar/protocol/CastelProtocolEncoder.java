@@ -48,7 +48,7 @@ public class CastelProtocolEncoder extends BaseProtocolEncoder {
         buf.writeShort(type);
         buf.writeBytes(content);
 
-        buf.writeShortLE(Checksum.crc16(Checksum.CRC16_X25, buf.nioBuffer()));
+        buf.writeShortLE(Checksum.crc16(Checksum.CRC16_X25, buf.nioBuffer())); // &line[Checksum_crc16]
 
         buf.writeByte('\r');
         buf.writeByte('\n');

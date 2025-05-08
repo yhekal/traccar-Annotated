@@ -17,8 +17,6 @@
  */
 package org.traccar.api.resource;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.core.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.traccar.BaseProtocol;
@@ -70,12 +68,6 @@ public class CommandResource extends ExtendedObjectResource<Command> {
     @Inject
     private ServerManager serverManager;
 
-    @Inject
-    private LogAction actionLogger;
-
-    @Context
-    private HttpServletRequest request;
-
     public CommandResource() {
         super(Command.class, "description");
     }
@@ -93,7 +85,7 @@ public class CommandResource extends ExtendedObjectResource<Command> {
     @GET
     @Path("send")
     public Collection<Command> get(@QueryParam("deviceId") long deviceId) throws StorageException {
-        permissionsService.checkPermission(Device.class, getUserId(), deviceId);
+        permissionsService.checkPermission(Device.class, getUserId(), deviceId);  // &line[checkPermission]
         BaseProtocol protocol = getDeviceProtocol(deviceId);
 
         var commands = storage.getObjects(baseClass, new Request(
@@ -118,18 +110,18 @@ public class CommandResource extends ExtendedObjectResource<Command> {
     @Path("send")
     public Response send(Command entity, @QueryParam("groupId") long groupId) throws Exception {
         if (entity.getId() > 0) {
-            permissionsService.checkPermission(baseClass, getUserId(), entity.getId());
+            permissionsService.checkPermission(baseClass, getUserId(), entity.getId()); // &line[checkPermission]
             long deviceId = entity.getDeviceId();
             entity = storage.getObject(baseClass, new Request(
                     new Columns.All(), new Condition.Equals("id", entity.getId())));
             entity.setDeviceId(deviceId);
         } else {
-            permissionsService.checkRestriction(getUserId(), UserRestrictions::getLimitCommands);
+            permissionsService.checkRestriction(getUserId(), UserRestrictions::getLimitCommands); // &line[checkRestriction]
         }
 
         if (groupId > 0) {
-            permissionsService.checkPermission(Group.class, getUserId(), groupId);
-            var devices = DeviceUtil.getAccessibleDevices(storage, getUserId(), List.of(), List.of(groupId));
+            permissionsService.checkPermission(Group.class, getUserId(), groupId); // &line[checkPermission]
+            var devices = DeviceUtil.getAccessibleDevices(storage, getUserId(), List.of(), List.of(groupId)); // &line[getAccessibleDevices]
             List<QueuedCommand> queuedCommands = new ArrayList<>();
             for (Device device : devices) {
                 Command command = QueuedCommand.fromCommand(entity).toCommand();
@@ -143,14 +135,14 @@ public class CommandResource extends ExtendedObjectResource<Command> {
                 return Response.accepted(queuedCommands).build();
             }
         } else {
-            permissionsService.checkPermission(Device.class, getUserId(), entity.getDeviceId());
+            permissionsService.checkPermission(Device.class, getUserId(), entity.getDeviceId()); // &line[checkPermission]
             QueuedCommand queuedCommand = commandsManager.sendCommand(entity);
             if (queuedCommand != null) {
                 return Response.accepted(queuedCommand).build();
             }
         }
 
-        actionLogger.command(request, getUserId(), groupId, entity.getDeviceId(), entity.getType());
+        LogAction.command(getUserId(), groupId, entity.getDeviceId(), entity.getType());
         return Response.ok(entity).build();
     }
 
@@ -160,7 +152,7 @@ public class CommandResource extends ExtendedObjectResource<Command> {
             @QueryParam("deviceId") long deviceId,
             @QueryParam("textChannel") boolean textChannel) throws StorageException {
         if (deviceId != 0) {
-            permissionsService.checkPermission(Device.class, getUserId(), deviceId);
+            permissionsService.checkPermission(Device.class, getUserId(), deviceId); // &line[checkPermission]
             BaseProtocol protocol = getDeviceProtocol(deviceId);
             if (protocol != null) {
                 if (textChannel) {

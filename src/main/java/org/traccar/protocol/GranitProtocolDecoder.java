@@ -42,7 +42,7 @@ public class GranitProtocolDecoder extends BaseProtocolDecoder {
 
     public static void appendChecksum(ByteBuf buffer, int length) {
         buffer.writeByte('*');
-        int checksum = Checksum.xor(buffer.nioBuffer(0, length)) & 0xFF;
+        int checksum = Checksum.xor(buffer.nioBuffer(0, length)) & 0xFF; // &line[Checksum_xor]
         String checksumString = String.format("%02X", checksum);
         buffer.writeBytes(checksumString.getBytes(StandardCharsets.US_ASCII));
         buffer.writeByte('\r'); buffer.writeByte('\n');

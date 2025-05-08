@@ -33,7 +33,7 @@ public class R12wProtocolDecoder extends BaseProtocolDecoder {
     private void sendResponse(Channel channel, String type, String id, String data) {
         if (channel != null) {
             String sentence = String.format("$HX,%s,%s,%s,#", type, id, data);
-            sentence += String.format(",%02x,\r\n", Checksum.xor(sentence));
+            sentence += String.format(",%02x,\r\n", Checksum.xor(sentence)); // &line[Checksum_xor]
             channel.writeAndFlush(new NetworkMessage(sentence, channel.remoteAddress()));
         }
     }

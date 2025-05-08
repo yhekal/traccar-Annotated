@@ -15,9 +15,7 @@
  */
 package org.traccar.api.resource;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.FormParam;
-import jakarta.ws.rs.core.Context;
 import org.traccar.api.BaseObjectResource;
 import org.traccar.api.signature.TokenManager;
 import org.traccar.broadcast.BroadcastService;
@@ -86,12 +84,6 @@ public class DeviceResource extends BaseObjectResource<Device> {
     @Inject
     private TokenManager tokenManager;
 
-    @Inject
-    private LogAction actionLogger;
-
-    @Context
-    private HttpServletRequest request;
-
     public DeviceResource() {
         super(Device.class);
     }
@@ -126,14 +118,14 @@ public class DeviceResource extends BaseObjectResource<Device> {
             var conditions = new LinkedList<Condition>();
 
             if (all) {
-                if (permissionsService.notAdmin(getUserId())) {
+                if (permissionsService.notAdmin(getUserId())) { // &line[notAdmin]
                     conditions.add(new Condition.Permission(User.class, getUserId(), baseClass));
                 }
             } else {
                 if (userId == 0) {
                     conditions.add(new Condition.Permission(User.class, getUserId(), baseClass));
                 } else {
-                    permissionsService.checkUser(getUserId(), userId);
+                    permissionsService.checkUser(getUserId(), userId); // &line[checkUser]
                     conditions.add(new Condition.Permission(User.class, userId, baseClass).excludeGroups());
                 }
             }
@@ -147,8 +139,8 @@ public class DeviceResource extends BaseObjectResource<Device> {
     @Path("{id}/accumulators")
     @PUT
     public Response updateAccumulators(DeviceAccumulators entity) throws Exception {
-        permissionsService.checkPermission(Device.class, getUserId(), entity.getDeviceId());
-        permissionsService.checkEdit(getUserId(), Device.class, false, false);
+        permissionsService.checkPermission(Device.class, getUserId(), entity.getDeviceId()); // &line[checkPermission]
+        permissionsService.checkEdit(getUserId(), Device.class, false, false); // &line[checkEdit]
 
         Position position = storage.getObject(Position.class, new Request(
                 new Columns.All(), new Condition.LatestPositions(entity.getDeviceId())));
@@ -180,7 +172,7 @@ public class DeviceResource extends BaseObjectResource<Device> {
             throw new IllegalArgumentException();
         }
 
-        actionLogger.resetAccumulators(request, getUserId(), entity.getDeviceId());
+        LogAction.resetAccumulators(getUserId(), entity.getDeviceId());
         return Response.noContent().build();
     }
 
@@ -238,13 +230,13 @@ public class DeviceResource extends BaseObjectResource<Device> {
 
         User user = permissionsService.getUser(getUserId());
         if (permissionsService.getServer().getBoolean(Keys.DEVICE_SHARE_DISABLE.getKey())) {
-            throw new SecurityException("Sharing is disabled");
+            throw new SecurityException("Sharing is disabled"); // &line[SecurityExceptionSharing]
         }
         if (user.getTemporary()) {
-            throw new SecurityException("Temporary user");
+            throw new SecurityException("Temporary user");  // &line[SecurityExceptionTempUser]
         }
-        if (user.getExpirationTime() != null && user.getExpirationTime().before(expiration)) {
-            expiration = user.getExpirationTime();
+        if (user.getExpirationTime() != null && user.getExpirationTime().before(expiration)) { // &line[getExpirationTime]
+            expiration = user.getExpirationTime(); // &line[getExpirationTime]
         }
 
         Device device = storage.getObject(Device.class, new Request(
@@ -269,10 +261,10 @@ public class DeviceResource extends BaseObjectResource<Device> {
 
             share.setId(storage.addObject(share, new Request(new Columns.Exclude("id"))));
 
-            storage.addPermission(new Permission(User.class, share.getId(), Device.class, deviceId));
+            storage.addPermission(new Permission(User.class, share.getId(), Device.class, deviceId)); // &line[addPermission]
         }
 
-        return tokenManager.generateToken(share.getId(), expiration);
+        return tokenManager.generateToken(share.getId(), expiration); // &line[generateToken]
     }
 
 }

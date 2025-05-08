@@ -44,7 +44,7 @@ public class ThrottlingFilter extends DoSFilter {
 
     @Override
     protected String extractUserId(ServletRequest request) {
-        HttpSession session = ((HttpServletRequest) request).getSession(false);
+        HttpSession session = ((HttpServletRequest) request).getSession(false); // &line[getSession]
         if (session != null) {
             var userId = session.getAttribute("userId");
             return userId != null ? userId.toString() : null;

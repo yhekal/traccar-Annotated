@@ -60,7 +60,7 @@ public class FreematicsProtocolDecoder extends BaseProtocolDecoder {
 
         if (channel != null && deviceSession != null && event != null && time != null) {
             String message = String.format("1#EV=%s,RX=1,TS=%s", event, time);
-            message += '*' + Checksum.sum(message);
+            message += '*' + Checksum.sum(message); // &line[Checksum_sum]
             channel.writeAndFlush(new NetworkMessage(message, remoteAddress));
         }
 

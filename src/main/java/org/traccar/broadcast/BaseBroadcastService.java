@@ -73,7 +73,7 @@ public abstract class BaseBroadcastService implements BroadcastService {
             boolean local, Class<T> clazz, long id, ObjectOperation operation) {
         BroadcastMessage message = new BroadcastMessage();
         var invalidateObject = new BroadcastMessage.InvalidateObject();
-        invalidateObject.setClazz(Permission.getKey(clazz));
+        invalidateObject.setClazz(Permission.getKey(clazz)); // &line[getKey]
         invalidateObject.setId(id);
         invalidateObject.setOperation(operation);
         message.setInvalidateObject(invalidateObject);
@@ -81,19 +81,20 @@ public abstract class BaseBroadcastService implements BroadcastService {
     }
 
     @Override
+            // &begin[invalidatePermission]
     public synchronized <T1 extends BaseModel, T2 extends BaseModel> void invalidatePermission(
             boolean local, Class<T1> clazz1, long id1, Class<T2> clazz2, long id2, boolean link) {
         BroadcastMessage message = new BroadcastMessage();
         var invalidatePermission = new BroadcastMessage.InvalidatePermission();
-        invalidatePermission.setClazz1(Permission.getKey(clazz1));
+        invalidatePermission.setClazz1(Permission.getKey(clazz1)); // &line[getKey]
         invalidatePermission.setId1(id1);
-        invalidatePermission.setClazz2(Permission.getKey(clazz2));
+        invalidatePermission.setClazz2(Permission.getKey(clazz2));  // &line[getKey]
         invalidatePermission.setId2(id2);
         invalidatePermission.setLink(link);
         message.setInvalidatePermission(invalidatePermission);
         sendMessage(message);
     }
-
+    // &end[invalidatePermission]
     protected abstract void sendMessage(BroadcastMessage message);
 
     protected void handleMessage(BroadcastMessage message) throws Exception {

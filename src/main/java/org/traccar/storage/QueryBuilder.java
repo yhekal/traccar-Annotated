@@ -481,6 +481,7 @@ public final class QueryBuilder {
         return 0;
     }
 
+// &begin[executePermissionsQuery]
     public List<Permission> executePermissionsQuery() throws SQLException {
         List<Permission> result = new LinkedList<>();
         if (query != null) {
@@ -505,5 +506,5 @@ public final class QueryBuilder {
 
         return result;
     }
-
+    // &end[executePermissionsQuery]
 }

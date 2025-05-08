@@ -266,12 +266,6 @@ public class FlespiProtocolDecoder extends BaseHttpProtocolDecoder {
                 }
                 yield true;
             }
-            case "external.powersource.status" -> {
-                if (value == JsonValue.TRUE) {
-                    position.addAlarm(Position.ALARM_POWER_CUT);
-                }
-                yield true;
-            }
             case "custom.wln_accel_max" -> {
                 position.set("maxAcceleration", ((JsonNumber) value).doubleValue());
                 yield true;

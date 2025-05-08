@@ -71,7 +71,7 @@ public class SnapperProtocolDecoder extends BaseProtocolDecoder {
             response.writeIntLE(answer.length());
             response.writeIntLE(0); // reserved
             response.writeShortLE(index);
-            response.writeByte(Checksum.sum(ByteBuffer.wrap(answer.getBytes(StandardCharsets.US_ASCII))));
+            response.writeByte(Checksum.sum(ByteBuffer.wrap(answer.getBytes(StandardCharsets.US_ASCII)))); // &line[Checksum_sum]
             response.writeShortLE(type);
             response.writeCharSequence(answer, StandardCharsets.US_ASCII);
             channel.writeAndFlush(new NetworkMessage(response, remoteAddress));
@@ -100,7 +100,7 @@ public class SnapperProtocolDecoder extends BaseProtocolDecoder {
                 }
                 case 0x01 -> {
                     position.set("interiorTemp", buf.readByte());
-                    position.set(Position.KEY_ENGINE_TEMP, buf.readByte());
+                    position.set("engineTemp", buf.readByte());
                     buf.readUnsignedByte(); // reserved
                 }
                 default -> buf.skipBytes(3);

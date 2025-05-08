@@ -57,9 +57,6 @@ public class UserResource extends BaseObjectResource<User> {
     @Inject
     private Config config;
 
-    @Inject
-    private LogAction actionLogger;
-
     @Context
     private HttpServletRequest request;
 
@@ -72,13 +69,13 @@ public class UserResource extends BaseObjectResource<User> {
             @QueryParam("userId") long userId, @QueryParam("deviceId") long deviceId) throws StorageException {
         var conditions = new LinkedList<Condition>();
         if (userId > 0) {
-            permissionsService.checkUser(getUserId(), userId);
+            permissionsService.checkUser(getUserId(), userId); // &line[checkUser]
             conditions.add(new Condition.Permission(User.class, userId, ManagedUser.class).excludeGroups());
-        } else if (permissionsService.notAdmin(getUserId())) {
+        } else if (permissionsService.notAdmin(getUserId())) { // &line[notAdmin]
             conditions.add(new Condition.Permission(User.class, getUserId(), ManagedUser.class).excludeGroups());
         }
         if (deviceId > 0) {
-            permissionsService.checkManager(getUserId());
+            permissionsService.checkManager(getUserId()); // &line[checkManager]
             conditions.add(new Condition.Permission(User.class, Device.class, deviceId).excludeGroups());
         }
         return storage.getObjects(baseClass, new Request(
@@ -90,14 +87,14 @@ public class UserResource extends BaseObjectResource<User> {
     @POST
     public Response add(User entity) throws StorageException {
         User currentUser = getUserId() > 0 ? permissionsService.getUser(getUserId()) : null;
-        if (currentUser == null || !currentUser.getAdministrator()) {
-            permissionsService.checkUserUpdate(getUserId(), new User(), entity);
+        if (currentUser == null || !currentUser.getAdministrator()) {  // &line[getAdministrator]
+            permissionsService.checkUserUpdate(getUserId(), new User(), entity); // &line[checkUserUpdate]
             if (currentUser != null && currentUser.getUserLimit() != 0) {
                 int userLimit = currentUser.getUserLimit();
                 if (userLimit > 0) {
                     int userCount = storage.getObjects(baseClass, new Request(
                             new Columns.All(),
-                            new Condition.Permission(User.class, getUserId(), ManagedUser.class).excludeGroups()))
+                            new Condition.Permission(User.class, getUserId(), ManagedUser.class).excludeGroups()))  // &line[excludeGroups]
                             .size();
                     if (userCount >= userLimit) {
                         throw new SecurityException("Manager user limit reached");
@@ -105,12 +102,12 @@ public class UserResource extends BaseObjectResource<User> {
                 }
             } else {
                 if (UserUtil.isEmpty(storage)) {
-                    entity.setAdministrator(true);
+                    entity.setAdministrator(true);  // &line[setAdministrator]
                 } else if (!permissionsService.getServer().getRegistration()) {
                     throw new SecurityException("Registration disabled");
                 }
-                if (permissionsService.getServer().getBoolean(Keys.WEB_TOTP_FORCE.getKey())
-                        && entity.getTotpKey() == null) {
+                if (permissionsService.getServer().getBoolean(Keys.WEB_TOTP_FORCE.getKey())  // &line[getKey]
+                        && entity.getTotpKey() == null) { // &line[getTotpKey]
                     throw new SecurityException("One-time password key is required");
                 }
                 UserUtil.setUserDefaults(entity, config);
@@ -122,11 +119,11 @@ public class UserResource extends BaseObjectResource<User> {
                 new Columns.Include("hashedPassword", "salt"),
                 new Condition.Equals("id", entity.getId())));
 
-        actionLogger.create(request, getUserId(), entity);
+        LogAction.create(getUserId(), entity); // &line[LogAction_create]
 
         if (currentUser != null && currentUser.getUserLimit() != 0) {
-            storage.addPermission(new Permission(User.class, getUserId(), ManagedUser.class, entity.getId()));
-            actionLogger.link(request, getUserId(), User.class, getUserId(), ManagedUser.class, entity.getId());
+            storage.addPermission(new Permission(User.class, getUserId(), ManagedUser.class, entity.getId())); // &line[addPermission]
+            LogAction.link(getUserId(), User.class, getUserId(), ManagedUser.class, entity.getId());
         }
         return Response.ok(entity).build();
     }
@@ -144,11 +141,13 @@ public class UserResource extends BaseObjectResource<User> {
     @Path("totp")
     @PermitAll
     @POST
+            // &begin[generateTotpKey]
     public String generateTotpKey() throws StorageException {
         if (!permissionsService.getServer().getBoolean(Keys.WEB_TOTP_ENABLE.getKey())) {
             throw new SecurityException("One-time password is disabled");
         }
-        return new GoogleAuthenticator().createCredentials().getKey();
+        return new GoogleAuthenticator().createCredentials().getKey(); // &end[GoogleAuthenticator_createCredentials_getKey]
     }
+    // &end[generateTotpKey]
 
 }

@@ -28,7 +28,7 @@ public class PretraceProtocolEncoder extends BaseProtocolEncoder {
 
     private String formatCommand(String uniqueId, String data) {
         String content = uniqueId + data;
-        return String.format("(%s^%02X)", content, Checksum.xor(content));
+        return String.format("(%s^%02X)", content, Checksum.xor(content)); // &line[Checksum_xor]
     }
 
     @Override

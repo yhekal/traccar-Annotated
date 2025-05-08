@@ -21,12 +21,14 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 
+// &begin[Hashing_Class]
+
 public final class Hashing {
 
     public static final int ITERATIONS = 1000;
     public static final int SALT_SIZE = 24;
     public static final int HASH_SIZE = 24;
-
+    // &begin[SecretKeyFactory]
     private static SecretKeyFactory factory;
     static {
         try {
@@ -35,7 +37,9 @@ public final class Hashing {
             e.printStackTrace();
         }
     }
+    // &end[SecretKeyFactory]
 
+    // &begin[HashingResult]
     public static class HashingResult {
 
         private final String hash;
@@ -45,15 +49,18 @@ public final class Hashing {
             this.hash = hash;
             this.salt = salt;
         }
-
+        // &begin[getHash]
         public String getHash() {
             return hash;
         }
-
+        // &end[getHash]
+        // &begin[getSalt]
         public String getSalt() {
             return salt;
         }
+        // &end[getSalt]
     }
+    // &end[HashingResult]
 
     private Hashing() {
     }
@@ -61,34 +68,37 @@ public final class Hashing {
     private static byte[] function(char[] password, byte[] salt) {
         try {
             PBEKeySpec spec = new PBEKeySpec(password, salt, ITERATIONS, HASH_SIZE * Byte.SIZE);
-            return factory.generateSecret(spec).getEncoded();
+            return factory.generateSecret(spec).getEncoded();  // &line[KeyGeneration_getEncoded_L]
         } catch (InvalidKeySpecException e) {
             throw new SecurityException(e);
         }
     }
 
-    private static final SecureRandom RANDOM = new SecureRandom();
-
+    private static final SecureRandom RANDOM = new SecureRandom(); // &line[SourceOfRandomness_SecureRandom_L]
+    // &begin[createHash]
     public static HashingResult createHash(String password) {
         byte[] salt = new byte[SALT_SIZE];
-        RANDOM.nextBytes(salt);
+        RANDOM.nextBytes(salt);  // &line[SourceOfRandomness_SecureRandom_nextBytes_L]
         byte[] hash = function(password.toCharArray(), salt);
         return new HashingResult(
                 DataConverter.printHex(hash),
                 DataConverter.printHex(salt));
     }
-
+    // &end[createHash]
+    // &begin[validatePassword]
     public static boolean validatePassword(String password, String hashHex, String saltHex) {
         byte[] hash = DataConverter.parseHex(hashHex);
         byte[] salt = DataConverter.parseHex(saltHex);
         return slowEquals(hash, function(password.toCharArray(), salt));
     }
+    // &end[validatePassword]
 
     /**
      * Compares two byte arrays in length-constant time. This comparison method
      * is used so that password hashes cannot be extracted from an on-line
      * system using a timing attack and then attacked off-line.
      */
+    // &begin[slowEquals]
     private static boolean slowEquals(byte[] a, byte[] b) {
         int diff = a.length ^ b.length;
         for (int i = 0; i < a.length && i < b.length; i++) {
@@ -96,5 +106,6 @@ public final class Hashing {
         }
         return diff == 0;
     }
-
+// &end[slowEquals]
 }
+// &end[Hashing_Class]

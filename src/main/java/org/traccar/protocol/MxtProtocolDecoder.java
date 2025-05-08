@@ -47,7 +47,7 @@ public class MxtProtocolDecoder extends BaseProtocolDecoder {
             response.writeByte(MSG_ACK);
             response.writeIntLE((int) id);
             response.writeShortLE(crc);
-            response.writeShortLE(Checksum.crc16(
+            response.writeShortLE(Checksum.crc16( // &line[Checksum_crc16]
                     Checksum.CRC16_XMODEM, response.nioBuffer()));
 
             ByteBuf encoded = Unpooled.buffer();

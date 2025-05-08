@@ -181,7 +181,7 @@ public class MeiligaoProtocolDecoder extends BaseProtocolDecoder {
         String id = builder.toString();
 
         if (id.length() == 14) {
-            return getDeviceSession(channel, remoteAddress, id, id + Checksum.luhn(Long.parseLong(id)));
+            return getDeviceSession(channel, remoteAddress, id, id + Checksum.luhn(Long.parseLong(id))); // &line[Checksum_luhn]
         } else {
             return getDeviceSession(channel, remoteAddress, id);
         }
@@ -201,7 +201,7 @@ public class MeiligaoProtocolDecoder extends BaseProtocolDecoder {
             buf.writeShort(type);
             buf.writeBytes(msg);
             msg.release();
-            buf.writeShort(Checksum.crc16(Checksum.CRC16_CCITT_FALSE, buf.nioBuffer()));
+            buf.writeShort(Checksum.crc16(Checksum.CRC16_CCITT_FALSE, buf.nioBuffer())); // &line[Checksum_crc16]
             buf.writeByte('\r');
             buf.writeByte('\n');
 

@@ -56,7 +56,7 @@ public class ThinkPowerProtocolDecoder extends BaseProtocolDecoder {
             } else {
                 response.writeShort(0);
             }
-            response.writeShort(Checksum.crc16(Checksum.CRC16_CCITT_FALSE, response.nioBuffer()));
+            response.writeShort(Checksum.crc16(Checksum.CRC16_CCITT_FALSE, response.nioBuffer())); // &line[Checksum_crc16]
             channel.writeAndFlush(new NetworkMessage(response, channel.remoteAddress()));
         }
     }

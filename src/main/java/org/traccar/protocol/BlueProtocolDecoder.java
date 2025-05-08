@@ -60,7 +60,7 @@ public class BlueProtocolDecoder extends BaseProtocolDecoder {
             response.writeByte(0);
             response.writeByte(0);
 
-            response.writeByte(Checksum.xor(response.nioBuffer(1, response.writerIndex() - 1)));
+            response.writeByte(Checksum.xor(response.nioBuffer(1, response.writerIndex() - 1))); // &line[Checksum_xor]
 
             channel.writeAndFlush(new NetworkMessage(response, channel.remoteAddress()));
         }
